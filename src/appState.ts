@@ -3,6 +3,7 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
+  GRID_SIZE,
 } from "./constants";
 import { t } from "./i18n";
 import { AppState, NormalizedZoomValue } from "./types";
@@ -41,7 +42,7 @@ export const getDefaultAppState = (): Omit<
     exportBackground: true,
     exportEmbedScene: false,
     fileHandle: null,
-    gridSize: null,
+    gridSize: GRID_SIZE,
     height: window.innerHeight,
     isBindingEnabled: true,
     isLibraryOpen: false,
@@ -63,6 +64,7 @@ export const getDefaultAppState = (): Omit<
     selectionElement: null,
     shouldAddWatermark: false,
     shouldCacheIgnoreZoom: false,
+    showGrid: false,
     showHelpDialog: false,
     showStats: false,
     startBoundElement: null,
@@ -120,6 +122,7 @@ const APP_STATE_STORAGE_CONF = (<
   exportEmbedScene: { browser: true, export: false },
   fileHandle: { browser: false, export: false },
   gridSize: { browser: true, export: true },
+  showGrid: { browser: true, export: false },
   height: { browser: false, export: false },
   isBindingEnabled: { browser: false, export: false },
   isLibraryOpen: { browser: false, export: false },

@@ -74,7 +74,7 @@ const excalidrawDiagram = {
   ],
   appState: {
     viewBackgroundColor: "#ffffff",
-    gridSize: null,
+    gridSize: 20,
   },
 };
 

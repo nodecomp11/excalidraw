@@ -24,6 +24,7 @@ const getStorageSizes = debounce((cb: (sizes: StorageSizes) => void) => {
 }, 500);
 
 export const Stats = (props: {
+  setAppState: React.Component<any, AppState>["setState"];
   appState: AppState;
   elements: readonly NonDeletedExcalidrawElement[];
   onClose: () => void;
@@ -45,6 +46,12 @@ export const Stats = (props: {
   const boundingBox = getCommonBounds(props.elements);
   const selectedElements = getTargetElements(props.elements, props.appState);
   const selectedBoundingBox = getCommonBounds(selectedElements);
+
+  const onGridSizeChange = () => {
+    props.setAppState({
+      gridSize: ((props.appState.gridSize - 5) % 50) + 10,
+    });
+  };
 
   if (isMobile && props.appState.openMenu) {
     return null;
@@ -155,6 +162,17 @@ export const Stats = (props: {
                   )}°`}
                 </td>
               </tr>
+            )}
+            {props.appState.showGrid && (
+              <>
+                <tr>
+                  <th colSpan={2}>{"Misc"}</th>
+                </tr>
+                <tr onClick={onGridSizeChange} style={{ cursor: "pointer" }}>
+                  <td>{"Grid size"}</td>
+                  <td>{props.appState.gridSize}</td>
+                </tr>
+              </>
             )}
           </tbody>
         </table>

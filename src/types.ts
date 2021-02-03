@@ -84,7 +84,8 @@ export type AppState = {
   toastMessage: string | null;
   zenModeEnabled: boolean;
   appearance: "light" | "dark";
-  gridSize: number | null;
+  gridSize: number;
+  showGrid: boolean;
   viewModeEnabled: boolean;
 
   /** top-most selected groups (i.e. does not include nested groups) */

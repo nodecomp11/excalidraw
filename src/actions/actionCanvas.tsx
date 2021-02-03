@@ -3,7 +3,7 @@ import { getDefaultAppState } from "../appState";
 import { ColorPicker } from "../components/ColorPicker";
 import { resetZoom, trash, zoomIn, zoomOut } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
-import { ZOOM_STEP } from "../constants";
+import { GRID_SIZE, ZOOM_STEP } from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
 import { newElementWith } from "../element/mutateElement";
 import { ExcalidrawElement } from "../element/types";
@@ -52,7 +52,7 @@ export const actionClearCanvas = register({
         elementLocked: appState.elementLocked,
         exportBackground: appState.exportBackground,
         exportEmbedScene: appState.exportEmbedScene,
-        gridSize: appState.gridSize,
+        gridSize: appState.gridSize || GRID_SIZE,
         shouldAddWatermark: appState.shouldAddWatermark,
         showStats: appState.showStats,
         pasteDialog: appState.pasteDialog,
