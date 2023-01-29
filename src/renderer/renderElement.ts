@@ -44,6 +44,8 @@ import {
   getBoundTextElement,
   getBoundTextElementOffset,
   getContainerElement,
+  getLineWidth,
+  getMaxTextElementWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 
@@ -276,6 +278,7 @@ const drawElementOnCanvas = (
         context.textAlign = element.textAlign as CanvasTextAlign;
 
         // Canvas does not support multiline text by default
+        const margin = getBoundTextElementOffset(element);
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeight = element.containerId
           ? getApproxLineHeight(getFontString(element))
@@ -284,17 +287,35 @@ const drawElementOnCanvas = (
         if (element.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
           verticalOffset = getBoundTextElementOffset(element);
         }
-
+        const spaceWidth = getLineWidth(" ", getFontString(element));
+        const maxWidth = getMaxTextElementWidth(element);
         const horizontalOffset =
           element.textAlign === "center"
             ? element.width / 2
             : element.textAlign === "right"
-            ? element.width
-            : 0;
+            ? element.width - margin
+            : margin;
         for (let index = 0; index < lines.length; index++) {
+          let marginToAdd = 0;
+
+          if (element.textAlign === "center" || element.textAlign === "right") {
+            const trimmedLineWidth = getLineWidth(
+              lines[index].trimEnd(),
+              getFontString(element),
+            );
+            const aviableWidth = maxWidth - trimmedLineWidth;
+            const trailingSpacesWidth =
+              (lines[index].length - lines[index].trimEnd().length) *
+              spaceWidth;
+            marginToAdd = -Math.min(aviableWidth, trailingSpacesWidth);
+            if (element.textAlign === "center") {
+              marginToAdd /= 2;
+            }
+          }
+
           context.fillText(
-            lines[index],
-            horizontalOffset,
+            lines[index].trimEnd(),
+            horizontalOffset + marginToAdd,
             (index + 1) * lineHeight - verticalOffset,
           );
         }
