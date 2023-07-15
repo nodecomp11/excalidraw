@@ -685,13 +685,18 @@ export const _renderScene = ({
           locallySelectedElements[0],
           renderConfig.zoom,
           "mouse", // when we render we don't know which pointer type so use mouse
+          appState.croppingModeEnabled,
         );
         if (!appState.viewModeEnabled && showBoundingBox) {
+          // if (appState.croppingModeEnabled) {
+          //   transformHandles = adjustTransformHandlesForCropping(transformHandles);
+          // }
           renderTransformHandles(
             context,
             renderConfig,
             transformHandles,
             locallySelectedElements[0].angle,
+            appState.croppingModeEnabled,
           );
         }
       } else if (locallySelectedElements.length > 1 && !appState.isRotating) {
@@ -726,7 +731,13 @@ export const _renderScene = ({
             : OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
         );
         if (locallySelectedElements.some((element) => !element.locked)) {
-          renderTransformHandles(context, renderConfig, transformHandles, 0);
+          renderTransformHandles(
+            context,
+            renderConfig,
+            transformHandles,
+            0,
+            appState.croppingModeEnabled,
+          );
         }
       }
       context.restore();
@@ -950,6 +961,7 @@ const renderTransformHandles = (
   renderConfig: RenderConfig,
   transformHandles: TransformHandles,
   angle: number,
+  cropModeEnabled: boolean = false,
 ): void => {
   Object.keys(transformHandles).forEach((key) => {
     const transformHandle = transformHandles[key as TransformHandleType];
@@ -961,15 +973,23 @@ const renderTransformHandles = (
       if (renderConfig.selectionColor) {
         context.strokeStyle = renderConfig.selectionColor;
       }
+
       if (key === "rotation") {
+        context.fillStyle = oc.white;
         fillCircle(context, x + width / 2, y + height / 2, width / 2);
         // prefer round corners if roundRect API is available
       } else if (context.roundRect) {
+        if (cropModeEnabled) {
+          context.fillStyle = "#228be6";
+        }
         context.beginPath();
         context.roundRect(x, y, width, height, 2 / renderConfig.zoom.value);
         context.fill();
         context.stroke();
       } else {
+        if (cropModeEnabled) {
+          context.fillStyle = "#228be6";
+        }
         strokeRectWithRotation(
           context,
           x,

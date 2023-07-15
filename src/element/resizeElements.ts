@@ -577,6 +577,12 @@ export const resizeSingleElement = (
     points: rescaledPoints,
   };
 
+  updateInternalScale(
+    element,
+    eleNewWidth / element.width,
+    eleNewHeight / element.height,
+  );
+
   if ("scale" in element && "scale" in stateAtResizeStart) {
     mutateElement(element, {
       scale: [
@@ -600,6 +606,7 @@ export const resizeSingleElement = (
     });
 
     mutateElement(element, resizedElement);
+
     if (boundTextElement && boundTextFont != null) {
       mutateElement(boundTextElement, {
         fontSize: boundTextFont.fontSize,
@@ -608,6 +615,36 @@ export const resizeSingleElement = (
     }
     handleBindTextResize(element, transformHandleDirection);
   }
+};
+
+const updateInternalScale = (
+  element: NonDeletedExcalidrawElement,
+  scaleX: number,
+  scaleY: number,
+) => {
+  if ("type" in element && element.type === "image") {
+    element = element as ExcalidrawImageElement;
+  } else {
+    return;
+  }
+
+  // if the scales happen to be 0 (which is insanely unlikely), it will
+  // zero out the rolling multiplier and cause weird bugs with cropping.
+  // if zero is detected, just set the scales to an obnoxiously small number
+  if (scaleX === 0) {
+    scaleX = Number.EPSILON;
+  }
+  if (scaleY === 0) {
+    scaleY = Number.EPSILON;
+  }
+
+  scaleX = Math.abs(scaleX);
+  scaleY = Math.abs(scaleY);
+
+  mutateElement(element, {
+    rescaleX: element.rescaleX * scaleX,
+    rescaleY: element.rescaleY * scaleY,
+  });
 };
 
 export const resizeMultipleElements = (
@@ -835,7 +872,6 @@ export const resizeMultipleElements = (
         };
       }
     }
-
     elementsAndUpdates.push({ element: latest, update, boundText });
   }
 

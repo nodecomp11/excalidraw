@@ -109,6 +109,7 @@ export type AppState = {
   errorMessage: React.ReactNode;
   draggingElement: NonDeletedExcalidrawElement | null;
   resizingElement: NonDeletedExcalidrawElement | null;
+  croppingElement: NonDeletedExcalidrawElement | null;
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;
   selectionElement: NonDeletedExcalidrawElement | null;
   isBindingEnabled: boolean;
@@ -171,6 +172,8 @@ export type AppState = {
   name: string;
   isResizing: boolean;
   isRotating: boolean;
+  isCropping: boolean;
+  croppingModeEnabled: boolean;
   zoom: Zoom;
   openMenu: "canvas" | "shape" | null;
   openPopup: "canvasBackground" | "elementBackground" | "elementStroke" | null;
@@ -475,6 +478,12 @@ export type PointerDownState = Readonly<{
     arrowDirection: "origin" | "end";
     // This is a center point of selected elements determined on the initial pointer down event (for rotation only)
     center: { x: number; y: number };
+  };
+  crop: {
+    handleType: MaybeTransformHandleType;
+    isCropping: boolean;
+    offset: { x: number; y: number };
+    complete: boolean;
   };
   hit: {
     // The element the pointer is "hitting", is determined on the initial

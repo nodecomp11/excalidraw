@@ -117,6 +117,8 @@ export type ActionName =
   | "toggleLinearEditor"
   | "toggleEraserTool"
   | "toggleHandTool"
+  | "wrapTextInContainer"
+  | "cropImage"
   | "selectAllElementsInFrame"
   | "removeAllElementsFromFrame"
   | "updateFrameRendering"

@@ -205,6 +205,7 @@ export const SelectedShapeActions = ({
             {renderAction("group")}
             {renderAction("ungroup")}
             {showLinkIcon && renderAction("hyperlink")}
+            {renderAction("cropImage")}
           </div>
         </fieldset>
       )}

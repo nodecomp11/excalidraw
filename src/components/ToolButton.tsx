@@ -27,6 +27,7 @@ type ToolButtonBaseProps = {
   className?: string;
   style?: CSSProperties;
   isLoading?: boolean;
+  activated?: boolean;
 };
 
 type ToolButtonProps =
@@ -114,6 +115,7 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
             "ToolIcon--selected": props.selected,
             "ToolIcon--plain": props.type === "icon",
           },
+          props.activated ? "ToolIcon--activated" : "",
         )}
         style={props.style}
         data-testid={props["data-testid"]}
