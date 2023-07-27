@@ -5,6 +5,7 @@ import {
   DEFAULT_VERSION,
   EVENT,
   FONT_FAMILY,
+  FONT_FAMILY_FALLBACKS,
   isDarwin,
   MIME_TYPES,
   THEME,
@@ -91,7 +92,7 @@ export const getFontFamilyString = ({
 }) => {
   for (const [fontFamilyString, id] of Object.entries(FONT_FAMILY)) {
     if (id === fontFamily) {
-      return `${fontFamilyString}, ${WINDOWS_EMOJI_FALLBACK_FONT}`;
+      return `${fontFamilyString}, ${FONT_FAMILY_FALLBACKS[id]}`;
     }
   }
   return WINDOWS_EMOJI_FALLBACK_FONT;

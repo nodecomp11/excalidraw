@@ -99,6 +99,14 @@ export const FONT_FAMILY = {
   Cascadia: 3,
 };
 
+export const WINDOWS_EMOJI_FALLBACK_FONT = "'Segoe UI Emoji'";
+
+export const FONT_FAMILY_FALLBACKS = {
+  [FONT_FAMILY.Virgil]: `'Comic Sans MS', 'Segoe Print', 'Bradley Hand', 'Lucida Handwriting', 'Marker Felt', cursive, ${WINDOWS_EMOJI_FALLBACK_FONT}`,
+  [FONT_FAMILY.Helvetica]: `-apple-system,BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif, 'Apple Color Emoji', ${WINDOWS_EMOJI_FALLBACK_FONT}`,
+  [FONT_FAMILY.Cascadia]: `ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace, ${WINDOWS_EMOJI_FALLBACK_FONT}`,
+};
+
 export const THEME = {
   LIGHT: "light",
   DARK: "dark",
@@ -114,8 +122,6 @@ export const FRAME_STYLE = {
   backgroundColor: "transparent" as ExcalidrawElement["backgroundColor"],
   radius: 8,
 };
-
-export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
 
 export const DEFAULT_FONT_SIZE = 20;
 export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Virgil;
