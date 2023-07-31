@@ -76,6 +76,7 @@ export const redrawTextBoundingBox = (
     boundTextUpdates.text,
     getFontString(textElement),
     textElement.lineHeight,
+    maxWidth,
   );
 
   boundTextUpdates.width = metrics.width;
@@ -195,6 +196,7 @@ export const handleBindTextResize = (
         text,
         getFontString(textElement),
         textElement.lineHeight,
+        maxWidth,
       );
       nextHeight = metrics.height;
       nextWidth = metrics.width;
@@ -283,6 +285,7 @@ export const measureText = (
   text: string,
   font: FontString,
   lineHeight: ExcalidrawTextElement["lineHeight"],
+  maxWidth?: number | null,
 ) => {
   text = text
     .split("\n")
@@ -292,7 +295,14 @@ export const measureText = (
     .join("\n");
   const fontSize = parseFloat(font);
   const height = getTextHeight(text, fontSize, lineHeight);
-  const width = getTextWidth(text, font);
+  let width = getTextWidth(text, font);
+  // Since we now preserve trailing whitespaces so if the text has
+  // trailing whitespaces, it will be considered in the width and thus width
+  // computed might be much higher than the allowed max width
+  // by the container hence making sure the width never goes beyond the max width.
+  if (maxWidth) {
+    width = Math.min(width, maxWidth);
+  }
   const baseline = measureBaseline(text, font, lineHeight);
   return { width, height, baseline };
 };
@@ -380,7 +390,7 @@ export const getApproxMinLineHeight = (
 
 let canvas: HTMLCanvasElement | undefined;
 
-const getLineWidth = (text: string, font: FontString) => {
+export const getLineWidth = (text: string, font: FontString) => {
   if (!canvas) {
     canvas = document.createElement("canvas");
   }
@@ -440,10 +450,8 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
   if (!Number.isFinite(maxWidth) || maxWidth < 0) {
     return text;
   }
-
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
-  const spaceWidth = getLineWidth(" ", font);
 
   let currentLine = "";
   let currentLineWidthTillNow = 0;
@@ -459,7 +467,7 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
     currentLineWidthTillNow = 0;
   };
   originalLines.forEach((originalLine) => {
-    const currentLineWidth = getTextWidth(originalLine, font);
+    const currentLineWidth = getLineWidth(originalLine, font);
 
     // Push the line if its <= maxWidth
     if (currentLineWidth <= maxWidth) {
@@ -507,23 +515,25 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
           }
         }
         // push current line if appending space exceeds max width
-        if (currentLineWidthTillNow + spaceWidth >= maxWidth) {
+        if (currentLineWidthTillNow >= maxWidth) {
           push(currentLine);
           resetParams();
           // space needs to be appended before next word
           // as currentLine contains chars which couldn't be appended
           // to previous line unless the line ends with hyphen to sync
           // with css word-wrap
-        } else if (!currentLine.endsWith("-")) {
+        } else if (!currentLine.endsWith("-") && index < words.length) {
           currentLine += " ";
-          currentLineWidthTillNow += spaceWidth;
         }
         index++;
       } else {
         // Start appending words in a line till max width reached
         while (currentLineWidthTillNow < maxWidth && index < words.length) {
           const word = words[index];
-          currentLineWidthTillNow = getLineWidth(currentLine + word, font);
+          currentLineWidthTillNow = getLineWidth(
+            `${currentLine + word}`.trimEnd(),
+            font,
+          );
 
           if (currentLineWidthTillNow > maxWidth) {
             push(currentLine);
@@ -531,24 +541,20 @@ export const wrapText = (text: string, font: FontString, maxWidth: number) => {
 
             break;
           }
-          index++;
 
           // if word ends with "-" then we don't need to add space
           // to sync with css word-wrap
           const shouldAppendSpace = !word.endsWith("-");
           currentLine += word;
 
-          if (shouldAppendSpace) {
+          if (shouldAppendSpace && index < words.length) {
             currentLine += " ";
           }
+          index++;
 
           // Push the word if appending space exceeds max width
-          if (currentLineWidthTillNow + spaceWidth >= maxWidth) {
-            if (shouldAppendSpace) {
-              lines.push(currentLine.slice(0, -1));
-            } else {
-              lines.push(currentLine);
-            }
+          if (currentLineWidthTillNow >= maxWidth) {
+            lines.push(currentLine);
             resetParams();
             break;
           }
@@ -971,4 +977,23 @@ export const getDefaultLineHeight = (fontFamily: FontFamilyValues) => {
     return DEFAULT_LINE_HEIGHT[fontFamily];
   }
   return DEFAULT_LINE_HEIGHT[DEFAULT_FONT_FAMILY];
+};
+
+export const getSpacesOffsetForLine = (
+  element: ExcalidrawTextElement,
+  line: string,
+  font: FontString,
+) => {
+  const container = getContainerElement(element);
+  const trailingSpacesWidth =
+    getLineWidth(line, font) - getLineWidth(line.trimEnd(), font);
+  const maxWidth = container ? getBoundTextMaxWidth(container) : element.width;
+  const availableWidth = maxWidth - getLineWidth(line.trimEnd(), font);
+  let spacesOffset = 0;
+  if (element.textAlign === TEXT_ALIGN.CENTER) {
+    spacesOffset = -Math.min(trailingSpacesWidth / 2, availableWidth / 2);
+  } else if (element.textAlign === TEXT_ALIGN.RIGHT) {
+    spacesOffset = -Math.min(availableWidth, trailingSpacesWidth);
+  }
+  return spacesOffset;
 };

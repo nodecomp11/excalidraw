@@ -53,6 +53,7 @@ import {
   getLineHeightInPx,
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
+  getSpacesOffsetForLine,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
@@ -336,13 +337,13 @@ const drawElementOnCanvas = (
         }
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         context.save();
-        context.font = getFontString(element);
+        const font = getFontString(element);
+        context.font = font;
         context.fillStyle = element.strokeColor;
         context.textAlign = element.textAlign as CanvasTextAlign;
 
         // Canvas does not support multiline text by default
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
-
         const horizontalOffset =
           element.textAlign === "center"
             ? element.width / 2
@@ -353,11 +354,17 @@ const drawElementOnCanvas = (
           element.fontSize,
           element.lineHeight,
         );
+
         const verticalOffset = element.height - element.baseline;
         for (let index = 0; index < lines.length; index++) {
-          context.fillText(
+          const spacesOffset = getSpacesOffsetForLine(
+            element,
             lines[index],
-            horizontalOffset,
+            font,
+          );
+          context.fillText(
+            lines[index].trimEnd(),
+            horizontalOffset + spacesOffset,
             (index + 1) * lineHeightPx - verticalOffset,
           );
         }
