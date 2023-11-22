@@ -36,6 +36,7 @@ import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import { ContextMenuItems } from "./components/ContextMenu";
 import { SnapLine } from "./snapping";
 import { Merge, ValueOf } from "./utility-types";
+import { SearchResult } from "minisearch";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -143,6 +144,7 @@ export type StaticCanvasAppState = Readonly<
     selectedElementsAreBeingDragged: AppState["selectedElementsAreBeingDragged"];
     gridSize: AppState["gridSize"];
     frameRendering: AppState["frameRendering"];
+    searchTool: AppState["searchTool"];
   }
 >;
 
@@ -297,6 +299,12 @@ export type AppState = {
     y: number;
   } | null;
   objectsSnapModeEnabled: boolean;
+  searchTool: {
+    activated: boolean;
+    query: string;
+    resultsPos: number;
+    results: SearchResult[];
+  };
 };
 
 export type UIAppState = Omit<
