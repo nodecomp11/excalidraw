@@ -8867,27 +8867,8 @@ class App extends React.Component<AppProps, AppState> {
       event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
     );
 
-    const frameElementsOffsetsMap = new Map<
-      string,
-      {
-        x: number;
-        y: number;
-      }
-    >();
-
-    selectedFrames.forEach((frame) => {
-      const elementsInFrame = getFrameChildren(
-        this.scene.getNonDeletedElements(),
-        frame.id,
-      );
-
-      elementsInFrame.forEach((element) => {
-        frameElementsOffsetsMap.set(frame.id + element.id, {
-          x: element.x - frame.x,
-          y: element.y - frame.y,
-        });
-      });
-    });
+    const resizingSingleFrameOnly =
+      selectedElements.length === 1 && selectedFrames.length === 1;
 
     // check needed for avoiding flickering when a key gets pressed
     // during dragging
@@ -8928,7 +8909,12 @@ class App extends React.Component<AppProps, AppState> {
       transformElements(
         pointerDownState,
         transformHandleType,
-        selectedElements,
+        resizingSingleFrameOnly
+          ? selectedElements
+          : this.scene.getSelectedElements({
+              selectedElementIds: this.state.selectedElementIds,
+              includeElementsInFrames: true,
+            }),
         pointerDownState.resize.arrowDirection,
         shouldRotateWithDiscreteAngle(event),
         shouldResizeFromCenter(event),
@@ -8944,18 +8930,19 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       this.maybeSuggestBindingForAll(selectedElements);
 
-      const elementsToHighlight = new Set<ExcalidrawElement>();
-      selectedFrames.forEach((frame) => {
-        getElementsInResizingFrame(
-          this.scene.getNonDeletedElements(),
-          frame,
-          this.state,
-        ).forEach((element) => elementsToHighlight.add(element));
-      });
-
-      this.setState({
-        elementsToHighlight: [...elementsToHighlight],
-      });
+      // highlight frame children ONLY when resizing a single frame
+      if (resizingSingleFrameOnly) {
+        const selectedFrame = selectedFrames[0];
+        if (selectedFrame) {
+          this.setState({
+            elementsToHighlight: getElementsInResizingFrame(
+              this.scene.getNonDeletedElements(),
+              selectedFrame,
+              this.state,
+            ),
+          });
+        }
+      }
 
       return true;
     }
