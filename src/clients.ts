@@ -1,3 +1,5 @@
+import { AppState } from "./types";
+
 function hashToInteger(id: string) {
   let hash = 0;
   if (id.length === 0) {
@@ -15,7 +17,15 @@ export const getClientColor = (
    * any uniquely identifying key, such as user id or socket id
    */
   id: string,
+  appState: Pick<AppState, "collaborators">,
 ) => {
+  if (appState.collaborators) {
+    const currentUser = appState.collaborators.get(id);
+    if (currentUser?.color) {
+      return currentUser.color.background;
+    }
+  }
+
   // to get more even distribution in case `id` is not uniformly distributed to
   // begin with, we hash it
   const hash = Math.abs(hashToInteger(id));

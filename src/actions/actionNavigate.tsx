@@ -31,10 +31,10 @@ export const actionGoToCollaborator = register({
       commitToHistory: false,
     };
   },
-  PanelComponent: ({ updateData, data }) => {
+  PanelComponent: ({ appState, updateData, data }) => {
     const [clientId, collaborator] = data as [string, Collaborator];
 
-    const background = getClientColor(clientId);
+    const background = getClientColor(clientId, appState);
 
     return (
       <Avatar

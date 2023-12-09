@@ -599,7 +599,7 @@ const _renderInteractiveScene = ({
             selectionColors.push(
               ...renderConfig.remoteSelectedElementIds[element.id].map(
                 (socketId: string) => {
-                  const background = getClientColor(socketId);
+                  const background = getClientColor(socketId, appState);
                   return background;
                 },
               ),
@@ -749,7 +749,7 @@ const _renderInteractiveScene = ({
     y = Math.max(y, 0);
     y = Math.min(y, normalizedHeight - height);
 
-    const background = getClientColor(clientId);
+    const background = getClientColor(clientId, appState);
 
     context.save();
     context.strokeStyle = background;

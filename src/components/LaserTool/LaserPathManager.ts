@@ -276,7 +276,7 @@ export class LaserPathManager {
       }
 
       state.svg.setAttribute("d", paths);
-      state.svg.setAttribute("fill", getClientColor(key));
+      state.svg.setAttribute("fill", getClientColor(key, this.app.state));
     }
 
     this.ownState.finishedPaths = this.ownState.finishedPaths.filter((path) => {
