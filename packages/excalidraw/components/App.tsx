@@ -5085,7 +5085,7 @@ class App extends React.Component<AppProps, AppState> {
       });
     };
 
-    const idsToUpdate: Array<string> = [];
+    const idsToUpdate: string[] = [];
 
     const distance = distance2d(
       pointerDownState.lastCoords.x,
