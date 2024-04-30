@@ -9,6 +9,7 @@ import { trackEvent } from "../analytics";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { IconPicker } from "../components/IconPicker";
+import { FontPicker } from "../components/FontPicker/FontPicker";
 // TODO barnabasmolnar/editor-redesign
 // TextAlignTopIcon, TextAlignBottomIcon,TextAlignMiddleIcon,
 // ArrowHead icons
@@ -38,9 +39,6 @@ import {
   FontSizeExtraLargeIcon,
   EdgeSharpIcon,
   EdgeRoundIcon,
-  FreedrawIcon,
-  FontFamilyNormalIcon,
-  FontFamilyCodeIcon,
   TextAlignLeftIcon,
   TextAlignCenterIcon,
   TextAlignRightIcon,
@@ -52,9 +50,7 @@ import {
   fontSizeIcon,
 } from "../components/icons";
 import {
-  DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
-  FONT_FAMILY,
   ROUNDNESS,
   STROKE_WIDTH,
   VERTICAL_ALIGN,
@@ -79,7 +75,6 @@ import {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
-  FontFamilyValues,
   TextAlign,
   VerticalAlign,
 } from "../element/types";
@@ -767,66 +762,14 @@ export const actionChangeFontFamily = register({
     };
   },
   PanelComponent: ({ elements, appState, updateData, app }) => {
-    const options: {
-      value: FontFamilyValues;
-      text: string;
-      icon: JSX.Element;
-      testId: string;
-    }[] = [
-      {
-        value: FONT_FAMILY.Virgil,
-        text: t("labels.handDrawn"),
-        icon: FreedrawIcon,
-        testId: "font-family-virgil",
-      },
-      {
-        value: FONT_FAMILY.Helvetica,
-        text: t("labels.normal"),
-        icon: FontFamilyNormalIcon,
-        testId: "font-family-normal",
-      },
-      {
-        value: FONT_FAMILY.Cascadia,
-        text: t("labels.code"),
-        icon: FontFamilyCodeIcon,
-        testId: "font-family-code",
-      },
-    ];
-
     return (
       <fieldset>
         <legend>{t("labels.fontFamily")}</legend>
-        <ButtonIconSelect<FontFamilyValues | false>
-          group="font-family"
-          options={options}
-          value={getFormValue(
-            elements,
-            appState,
-            (element) => {
-              if (isTextElement(element)) {
-                return element.fontFamily;
-              }
-              const boundTextElement = getBoundTextElement(
-                element,
-                app.scene.getNonDeletedElementsMap(),
-              );
-              if (boundTextElement) {
-                return boundTextElement.fontFamily;
-              }
-              return null;
-            },
-            (element) =>
-              isTextElement(element) ||
-              getBoundTextElement(
-                element,
-                app.scene.getNonDeletedElementsMap(),
-              ) !== null,
-            (hasSelection) =>
-              hasSelection
-                ? null
-                : appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
-          )}
-          onChange={(value) => updateData(value)}
+        <FontPicker
+          elements={elements}
+          appState={appState}
+          updateData={updateData}
+          app={app}
         />
       </fieldset>
     );

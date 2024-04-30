@@ -2,6 +2,7 @@ import { isInteractive, isTransparent, isWritableElement } from "../../utils";
 import { ExcalidrawElement } from "../../element/types";
 import { AppState } from "../../types";
 import { TopPicks } from "./TopPicks";
+import { ButtonGroupDivider } from "../ButtonGroupDivider";
 import { Picker } from "./Picker";
 import * as Popover from "@radix-ui/react-popover";
 import { useAtom } from "jotai";
@@ -269,14 +270,7 @@ export const ColorPicker = ({
           type={type}
           topPicks={topPicks}
         />
-        <div
-          style={{
-            width: 1,
-            height: "100%",
-            backgroundColor: "var(--default-border-color)",
-            margin: "0 auto",
-          }}
-        />
+        <ButtonGroupDivider />
         <Popover.Root
           open={appState.openPopup === type}
           onOpenChange={(open) => {
