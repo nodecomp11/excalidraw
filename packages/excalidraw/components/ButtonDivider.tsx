@@ -1,8 +1,8 @@
-export const ButtonGroupDivider = () => (
+export const ButtonDivider = () => (
   <div
     style={{
       width: 1,
-      height: "16px",
+      height: "1rem",
       backgroundColor: "var(--default-border-color)",
       margin: "0 auto",
     }}

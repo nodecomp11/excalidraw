@@ -50,6 +50,7 @@ import {
   fontSizeIcon,
 } from "../components/icons";
 import {
+  DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   ROUNDNESS,
   STROKE_WIDTH,
@@ -729,8 +730,11 @@ export const actionChangeFontFamily = register({
   label: "labels.fontFamily",
   trackEvent: false,
   perform: (elements, appState, value, app) => {
-    return {
-      elements: changeProperty(
+    const { currentItemFontFamily } = value;
+    let nextElements: ReadonlyArray<ExcalidrawElement> = elements;
+
+    if (currentItemFontFamily) {
+      nextElements = changeProperty(
         elements,
         appState,
         (oldElement) => {
@@ -738,8 +742,8 @@ export const actionChangeFontFamily = register({
             const newElement: ExcalidrawTextElement = newElementWith(
               oldElement,
               {
-                fontFamily: value,
-                lineHeight: getDefaultLineHeight(value),
+                fontFamily: currentItemFontFamily,
+                lineHeight: getDefaultLineHeight(currentItemFontFamily),
               },
             );
             redrawTextBoundingBox(
@@ -753,23 +757,55 @@ export const actionChangeFontFamily = register({
           return oldElement;
         },
         true,
-      ),
+      );
+    }
+
+    return {
+      elements: nextElements,
       appState: {
         ...appState,
-        currentItemFontFamily: value,
+        ...value,
       },
       storeAction: StoreAction.CAPTURE,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => {
+  PanelComponent: ({ app, elements, appState, updateData }) => {
     return (
       <fieldset>
         <legend>{t("labels.fontFamily")}</legend>
         <FontPicker
-          elements={elements}
           appState={appState}
-          updateData={updateData}
-          app={app}
+          fontFamily={
+            getFormValue(
+              elements,
+              appState,
+              (element) => {
+                if (isTextElement(element)) {
+                  return element.fontFamily;
+                }
+                const boundTextElement = getBoundTextElement(
+                  element,
+                  app.scene.getNonDeletedElementsMap(),
+                );
+                if (boundTextElement) {
+                  return boundTextElement.fontFamily;
+                }
+                return null;
+              },
+              (element) =>
+                isTextElement(element) ||
+                getBoundTextElement(
+                  element,
+                  app.scene.getNonDeletedElementsMap(),
+                ) !== null,
+              (hasSelection) =>
+                hasSelection ? null : appState.currentItemFontFamily,
+            ) || DEFAULT_FONT_FAMILY
+          }
+          onChange={(fontFamily) =>
+            updateData({ currentItemFontFamily: fontFamily })
+          }
+          onPopupChange={(openType) => updateData({ openPopup: openType })}
         />
       </fieldset>
     );

@@ -6,18 +6,12 @@
 // - nothing is really pixel perfect according to the desing
 //   - buttons width / height, label paddings, sidebar width, divers height, text align icons, etc.
 // - mixing div.h3 and fieldset.label for labels
-// - button size is different on smaller sizes < 1921, we need to accomodate with of the group
-// - 
 
 .excalidraw {
   .font-picker-container {
     display: grid;
-    grid-template-columns: 1fr 16px 2.25rem; // 16px is base, 2rem should be default, 2.25 for > 1921
-    padding: 0.25rem 0px;
+    grid-template-columns: 1fr 1rem var(--default-button-size);
     align-items: center;
-
-    @include isMobile {
-      max-width: 176px; // actully depends on the button sizes
-    }
+    max-width: calc(2rem + 4*var(--default-button-size)); // 2 (0.5+0.5+1) gaps + 4 buttons
   }
 }
