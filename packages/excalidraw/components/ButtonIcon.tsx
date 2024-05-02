@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import clsx from "clsx";
 
 import "./ButtonIcon.scss";
@@ -13,23 +14,20 @@ interface ButtonIconProps {
   onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 }
 
-export const ButtonIcon = ({
-  icon,
-  title,
-  testId,
-  active,
-  standalone,
-  onClick,
-}: ButtonIconProps) => {
-  return (
-    <button
-      key={title}
-      title={title}
-      data-testid={testId}
-      className={clsx({ active, standalone })}
-      onClick={onClick}
-    >
-      {icon}
-    </button>
-  );
-};
+export const ButtonIcon = forwardRef<HTMLButtonElement, ButtonIconProps>(
+  (props, ref) => {
+    const { title, testId, active, standalone, icon, onClick } = props;
+    return (
+      <button
+        ref={ref}
+        key={title}
+        title={title}
+        data-testid={testId}
+        className={clsx({ active, standalone })}
+        onClick={onClick}
+      >
+        {icon}
+      </button>
+    );
+  },
+);
