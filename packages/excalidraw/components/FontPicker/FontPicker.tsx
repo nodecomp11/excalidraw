@@ -11,7 +11,7 @@ import {
   FreedrawIcon,
 } from "../icons";
 import { ButtonIcon } from "../ButtonIcon";
-import { ButtonDivider } from "../ButtonDivider";
+import { ButtonSeparator } from "../ButtonSeparator";
 import { FontFamilyValues } from "../../element/types";
 import { AppState } from "../../types";
 import { FONT_FAMILY } from "../../constants";
@@ -238,7 +238,7 @@ export const FontPicker = ({
           }
         }}
       />
-      <ButtonDivider />
+      <ButtonSeparator />
       <Popover.Root
         open={true}
         onOpenChange={(open) => {

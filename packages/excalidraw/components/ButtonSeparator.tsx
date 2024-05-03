@@ -1,4 +1,4 @@
-export const ButtonDivider = () => (
+export const ButtonSeparator = () => (
   <div
     style={{
       width: 1,
