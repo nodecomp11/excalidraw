@@ -774,8 +774,8 @@ export const actionChangeFontFamily = register({
       <fieldset>
         <legend>{t("labels.fontFamily")}</legend>
         <FontPicker
-          appState={appState}
-          fontFamily={
+          isOpened={appState.openPopup === "fontFamily"}
+          selectedFontFamily={
             getFormValue(
               elements,
               appState,
@@ -802,10 +802,20 @@ export const actionChangeFontFamily = register({
                 hasSelection ? null : appState.currentItemFontFamily,
             ) || DEFAULT_FONT_FAMILY
           }
-          onChange={(fontFamily) =>
-            updateData({ currentItemFontFamily: fontFamily })
+          onChange={(fontFamily) => {
+            if (fontFamily !== appState.currentItemFontFamily) {
+              updateData({ currentItemFontFamily: fontFamily } as Pick<
+                AppState,
+                "currentItemFontFamily"
+              >);
+            }
+          }}
+          onPopupChange={(isOpened) =>
+            updateData({ openPopup: isOpened ? "fontFamily" : null } as Pick<
+              AppState,
+              "openPopup"
+            >)
           }
-          onPopupChange={(openType) => updateData({ openPopup: openType })}
         />
       </fieldset>
     );

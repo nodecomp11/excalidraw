@@ -537,11 +537,14 @@
     "syntax": "Mermaid Syntax",
     "preview": "Preview"
   },
+  "quickSearch": {
+    "placeholder": "Quick search"
+  },
+  "fontList": {
+    "empty": "No fonts found"
+  },
   "userList": {
-    "search": {
-      "placeholder": "Quick search",
-      "empty": "No users found"
-    },
+    "empty": "No users found",
     "hint": {
       "text": "Click on user to follow",
       "followStatus": "You're currently following this user",

@@ -10,7 +10,6 @@ import {
   activeColorPickerSectionAtom,
   ColorPickerType,
 } from "./colorPickerUtils";
-import { useDevice, useExcalidrawContainer } from "../App";
 import { ColorTuple, COLOR_PALETTE, ColorPaletteCustom } from "../../colors";
 import PickerHeading from "./PickerHeading";
 import { t } from "../../i18n";
@@ -19,6 +18,8 @@ import { jotaiScope } from "../../jotai";
 import { ColorInput } from "./ColorInput";
 import { useRef } from "react";
 import { activeEyeDropperAtom } from "../EyeDropper";
+import { PropertiesPopover } from "../PropertiesPopover";
+import { useExcalidrawContainer } from "../App";
 
 import "./ColorPicker.scss";
 
@@ -73,15 +74,13 @@ const ColorPickerPopupContent = ({
   | "palette"
   | "updateData"
 >) => {
+  const { container } = useExcalidrawContainer();
   const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
 
   const [eyeDropperState, setEyeDropperState] = useAtom(
     activeEyeDropperAtom,
     jotaiScope,
   );
-
-  const { container } = useExcalidrawContainer();
-  const device = useDevice();
 
   const colorInputJSX = (
     <div>
@@ -105,120 +104,85 @@ const ColorPickerPopupContent = ({
   };
 
   return (
-    <Popover.Portal container={container}>
-      <Popover.Content
-        ref={popoverRef}
-        className="focus-visible-none"
-        data-prevent-outside-click
-        onFocusOutside={(event) => {
-          focusPickerContent();
+    <PropertiesPopover
+      container={container}
+      style={{ maxWidth: "208px" }}
+      onFocusOutside={(event) => {
+        focusPickerContent();
+        event.preventDefault();
+      }}
+      onPointerDownOutside={(event) => {
+        if (eyeDropperState) {
+          // prevent from closing if we click outside the popover
+          // while eyedropping (e.g. click when clicking the sidebar;
+          // the eye-dropper-backdrop is prevented downstream)
           event.preventDefault();
-        }}
-        onPointerDownOutside={(event) => {
-          if (eyeDropperState) {
-            // prevent from closing if we click outside the popover
-            // while eyedropping (e.g. click when clicking the sidebar;
-            // the eye-dropper-backdrop is prevented downstream)
-            event.preventDefault();
-          }
-        }}
-        onCloseAutoFocus={(e) => {
-          e.stopPropagation();
-          // prevents focusing the trigger
-          e.preventDefault();
-
-          // return focus to excalidraw container unless
-          // user focuses an interactive element, such as a button, or
-          // enters the text editor by clicking on canvas with the text tool
-          if (container && !isInteractive(document.activeElement)) {
-            container.focus();
-          }
-
-          updateData({ openPopup: null });
-          setActiveColorPickerSection(null);
-        }}
-        side={
-          device.editor.isMobile && !device.viewport.isLandscape
-            ? "bottom"
-            : "right"
         }
-        align={
-          device.editor.isMobile && !device.viewport.isLandscape
-            ? "center"
-            : "start"
+      }}
+      onCloseAutoFocus={(e) => {
+        e.stopPropagation();
+        // prevents focusing the trigger
+        e.preventDefault();
+
+        // return focus to excalidraw container unless
+        // user focuses an interactive element, such as a button, or
+        // enters the text editor by clicking on canvas with the text tool
+        if (container && !isInteractive(document.activeElement)) {
+          container.focus();
         }
-        alignOffset={-16}
-        sideOffset={20}
-        style={{
-          zIndex: "var(--zIndex-layerUI)",
-          backgroundColor: "var(--popup-bg-color)",
-          maxWidth: "208px",
-          maxHeight: window.innerHeight,
-          padding: "12px",
-          borderRadius: "8px",
-          boxSizing: "border-box",
-          overflowY: "auto",
-          boxShadow:
-            "0px 7px 14px rgba(0, 0, 0, 0.05), 0px 0px 3.12708px rgba(0, 0, 0, 0.0798), 0px 0px 0.931014px rgba(0, 0, 0, 0.1702)",
-        }}
-      >
-        {palette ? (
-          <Picker
-            palette={palette}
-            color={color}
-            onChange={(changedColor) => {
-              onChange(changedColor);
-            }}
-            onEyeDropperToggle={(force) => {
-              setEyeDropperState((state) => {
-                if (force) {
-                  state = state || {
-                    keepOpenOnAlt: true,
+
+        updateData({ openPopup: null });
+        setActiveColorPickerSection(null);
+      }}
+    >
+      {palette ? (
+        <Picker
+          palette={palette}
+          color={color}
+          onChange={(changedColor) => {
+            onChange(changedColor);
+          }}
+          onEyeDropperToggle={(force) => {
+            setEyeDropperState((state) => {
+              if (force) {
+                state = state || {
+                  keepOpenOnAlt: true,
+                  onSelect: onChange,
+                  colorPickerType: type,
+                };
+                state.keepOpenOnAlt = true;
+                return state;
+              }
+
+              return force === false || state
+                ? null
+                : {
+                    keepOpenOnAlt: false,
                     onSelect: onChange,
                     colorPickerType: type,
                   };
-                  state.keepOpenOnAlt = true;
-                  return state;
-                }
-
-                return force === false || state
-                  ? null
-                  : {
-                      keepOpenOnAlt: false,
-                      onSelect: onChange,
-                      colorPickerType: type,
-                    };
-              });
-            }}
-            onEscape={(event) => {
-              if (eyeDropperState) {
-                setEyeDropperState(null);
-              } else if (isWritableElement(event.target)) {
-                focusPickerContent();
-              } else {
-                updateData({ openPopup: null });
-              }
-            }}
-            label={label}
-            type={type}
-            elements={elements}
-            updateData={updateData}
-          >
-            {colorInputJSX}
-          </Picker>
-        ) : (
-          colorInputJSX
-        )}
-        <Popover.Arrow
-          width={20}
-          height={10}
-          style={{
-            fill: "var(--popup-bg-color)",
-            filter: "drop-shadow(rgba(0, 0, 0, 0.05) 0px 3px 2px)",
+            });
           }}
-        />
-      </Popover.Content>
-    </Popover.Portal>
+          onEscape={(event) => {
+            if (eyeDropperState) {
+              setEyeDropperState(null);
+            } else if (isWritableElement(event.target)) {
+              focusPickerContent();
+            } else {
+              updateData({ openPopup: null });
+            }
+          }}
+          label={label}
+          type={type}
+          elements={elements}
+          updateData={updateData}
+        >
+          {colorInputJSX}
+        </Picker>
+      ) : (
+        colorInputJSX
+      )}
+    </PropertiesPopover>
   );
 };
 

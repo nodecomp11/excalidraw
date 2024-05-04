@@ -8,10 +8,13 @@
 // - mixing div.h3 and fieldset.label for labels
 
 .excalidraw {
-  .font-picker-container {
+  .FontPicker__container {
     display: grid;
-    grid-template-columns: 1fr 1rem var(--default-button-size);
+    grid-template-columns: calc(1rem + 3* var(--default-button-size)) 1rem 1fr;
     align-items: center;
-    max-width: calc(2rem + 4*var(--default-button-size)); // 2 (0.5+0.5+1) gaps + 4 buttons
+
+    @include isMobile {
+      max-width: calc(2rem + 4*var(--default-button-size)); // 2 (0.5+0.5+1) gaps + 4 buttons
+    }
   }
 }
