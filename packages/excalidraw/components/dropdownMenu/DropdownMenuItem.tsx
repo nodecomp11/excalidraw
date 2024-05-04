@@ -46,6 +46,7 @@ export const DropDownMenuItemBadge = ({
 }) => {
   return (
     <div
+      className="DropDownMenuItemBadge"
       style={{
         display: "inline-flex",
         marginLeft: "auto",

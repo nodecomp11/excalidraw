@@ -2,7 +2,9 @@ import React, { useCallback } from "react";
 import _ from "lodash";
 import * as Popover from "@radix-ui/react-popover";
 
-import DropdownMenu from "../dropdownMenu/DropdownMenu";
+import DropdownMenuItem, {
+  DropDownMenuItemBadge,
+} from "../dropdownMenu/DropdownMenuItem";
 import { ButtonIconSelect } from "../ButtonIconSelect";
 import {
   FontFamilyCodeIcon,
@@ -18,9 +20,9 @@ import { FontFamilyValues } from "../../element/types";
 import { FONT_FAMILY } from "../../constants";
 import { t } from "../../i18n";
 import { useFilter } from "../../hooks/useFilter";
+import { useExcalidrawContainer } from "../App";
 
 import "./FontPicker.scss";
-import { useExcalidrawContainer } from "../App";
 
 interface FontPickerProps {
   isOpened: boolean;
@@ -44,7 +46,7 @@ const DEFAULT_FONTS = [
     text: t("labels.handDrawn"),
     icon: FreedrawIcon,
     testId: "font-family-virgil",
-    tag: "new",
+    badge: "new",
   },
   {
     value: FONT_FAMILY.Helvetica,
@@ -73,13 +75,16 @@ const FontPickerList = React.memo(() => {
         onChange={filterByCallback}
       />
       <ScrollableList
-        className="dropdown-menu"
+        className="FontPicker__list dropdown-menu"
         placeholder={t("fontList.empty")}
       >
         {filteredFonts.map((font, index) => (
-          <DropdownMenu.Item key={index} icon={font.icon} onSelect={() => {}}>
+          <DropdownMenuItem key={index} icon={font.icon} onSelect={() => {}}>
             <span>{font.text}</span>
-          </DropdownMenu.Item>
+            {font.badge && (
+              <DropDownMenuItemBadge>{font.badge}</DropDownMenuItemBadge>
+            )}
+          </DropdownMenuItem>
         ))}
       </ScrollableList>
     </PropertiesPopover>
@@ -104,7 +109,7 @@ export const FontPicker = React.memo(
           onClick={(value) => value && onChange(value)}
         />
         <ButtonSeparator />
-        <Popover.Root open={false} onOpenChange={onPopupChange}>
+        <Popover.Root open={true} onOpenChange={onPopupChange}>
           <Popover.Trigger asChild>
             {/* Empty div as trigger so it's stretched 100% due to different button sizes */}
             <div>
@@ -119,7 +124,7 @@ export const FontPicker = React.memo(
               />
             </div>
           </Popover.Trigger>
-          {/* <FontPickerList /> */}
+          <FontPickerList />
         </Popover.Root>
       </div>
     );
