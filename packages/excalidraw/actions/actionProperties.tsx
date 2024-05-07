@@ -733,7 +733,10 @@ export const actionChangeFontFamily = register({
     const { currentItemFontFamily } = value;
     let nextElements: ReadonlyArray<ExcalidrawElement> = elements;
 
-    if (currentItemFontFamily) {
+    if (
+      currentItemFontFamily &&
+      currentItemFontFamily !== appState.currentItemFontFamily
+    ) {
       nextElements = changeProperty(
         elements,
         appState,
@@ -803,12 +806,10 @@ export const actionChangeFontFamily = register({
             ) || DEFAULT_FONT_FAMILY
           }
           onChange={(fontFamily) => {
-            if (fontFamily !== appState.currentItemFontFamily) {
-              updateData({ currentItemFontFamily: fontFamily } as Pick<
-                AppState,
-                "currentItemFontFamily"
-              >);
-            }
+            updateData({ currentItemFontFamily: fontFamily } as Pick<
+              AppState,
+              "currentItemFontFamily"
+            >);
           }}
           onPopupChange={(isOpened) =>
             updateData({ openPopup: isOpened ? "fontFamily" : null } as Pick<

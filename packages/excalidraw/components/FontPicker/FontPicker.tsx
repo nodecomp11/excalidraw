@@ -39,14 +39,19 @@ interface FontPickerProps {
 //   active?: boolean | undefined;
 // }
 
+const Badge = {
+  NEW: "new",
+  OLD: "old",
+};
+
 // FIXME_FONTS: add Map by ID, so we could also find the fonts easily
 const DEFAULT_FONTS = [
   {
-    value: FONT_FAMILY.Virgil,
-    text: t("labels.handDrawn"),
+    value: FONT_FAMILY.Virgil2,
+    text: "Virgil 2",
     icon: FreedrawIcon,
-    testId: "font-family-virgil",
-    badge: "new",
+    testId: "font-family-virgil-new",
+    badge: Badge.NEW,
   },
   {
     value: FONT_FAMILY.Helvetica,
@@ -62,9 +67,22 @@ const DEFAULT_FONTS = [
   },
 ];
 
-const getAllFonts = () => _.range(10).flatMap(() => DEFAULT_FONTS);
+const getAllFonts = () => [
+  {
+    value: FONT_FAMILY.Virgil,
+    text: "Virgil 1",
+    icon: FreedrawIcon,
+    testId: "font-family-virgil",
+    badge: Badge.OLD,
+  },
+  ..._.range(10).flatMap(() => DEFAULT_FONTS),
+];
 
-const FontPickerList = React.memo(() => {
+interface FontPickerListProps {
+  onClick: (value: number) => void;
+}
+
+const FontPickerList = React.memo(({ onClick }: FontPickerListProps) => {
   const { container } = useExcalidrawContainer();
   const [filteredFonts, filterByCallback] = useFilter(getAllFonts(), "text");
 
@@ -79,10 +97,19 @@ const FontPickerList = React.memo(() => {
         placeholder={t("fontList.empty")}
       >
         {filteredFonts.map((font, index) => (
-          <DropdownMenuItem key={index} icon={font.icon} onSelect={() => {}}>
+          <DropdownMenuItem
+            key={index}
+            icon={font.icon}
+            value={font.value}
+            onClick={(e) => onClick(Number(e.currentTarget.value))}
+          >
             <span>{font.text}</span>
             {font.badge && (
-              <DropDownMenuItemBadge>{font.badge}</DropDownMenuItemBadge>
+              <DropDownMenuItemBadge
+                type={font.badge === Badge.OLD ? "pink" : "green"}
+              >
+                {font.badge}
+              </DropDownMenuItemBadge>
             )}
           </DropdownMenuItem>
         ))}
@@ -99,6 +126,13 @@ export const FontPicker = React.memo(
     onPopupChange,
   }: FontPickerProps) => {
     const getDefaultFonts = useCallback(() => DEFAULT_FONTS, []);
+    const onClick = useCallback((value: number | false) => {
+      if (value) {
+        console.log(value);
+        onChange(value);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
       <div role="dialog" aria-modal="true" className="FontPicker__container">
@@ -106,7 +140,7 @@ export const FontPicker = React.memo(
           type="button"
           options={getDefaultFonts()}
           value={selectedFontFamily}
-          onClick={(value) => value && onChange(value)}
+          onClick={onClick}
         />
         <ButtonSeparator />
         <Popover.Root open={true} onOpenChange={onPopupChange}>
@@ -118,13 +152,11 @@ export const FontPicker = React.memo(
                 icon={FontFamilyNormalIcon}
                 title={t("labels.custom")}
                 testId={"font-family-custom"}
-                onClick={(event) => {
-                  console.error("Function not implemented.");
-                }}
+                onClick={(event) => onClick(Number(event.currentTarget.value))}
               />
             </div>
           </Popover.Trigger>
-          <FontPickerList />
+          <FontPickerList onClick={onClick} />
         </Popover.Root>
       </div>
     );

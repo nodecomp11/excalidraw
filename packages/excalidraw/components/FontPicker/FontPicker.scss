@@ -17,23 +17,4 @@
       max-width: calc(2rem + 4*var(--default-button-size)); // 4 gaps + 4 buttons
     }
   }
-
-  .FontPicker__list {
-    .DropDownMenuItemBadge {
-      text-transform: lowercase;
-      font-size: 0.625rem;
-      border-radius: 8px !important;
-      background-color: var(--background-color-badge) !important;
-      color: var(--color-badge) !important;
-      border: 1.5px solid white;
-    }
-  }
-
-  &.theme--dark {
-    .FontPicker__list {
-      .DropDownMenuItemBadge {
-        border: none;
-      }
-    }
-  }
 }
