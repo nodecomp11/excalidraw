@@ -811,12 +811,12 @@ export const actionChangeFontFamily = register({
               "currentItemFontFamily"
             >);
           }}
-          onPopupChange={(isOpened) =>
+          onPopupChange={(isOpened) => {
             updateData({ openPopup: isOpened ? "fontFamily" : null } as Pick<
               AppState,
               "openPopup"
-            >)
-          }
+            >);
+          }}
         />
       </fieldset>
     );

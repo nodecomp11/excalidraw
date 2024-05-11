@@ -1,4 +1,4 @@
-import { isInteractive, isTransparent, isWritableElement } from "../../utils";
+import { isTransparent } from "../../utils";
 import { ExcalidrawElement } from "../../element/types";
 import { AppState } from "../../types";
 import { TopPicks } from "./TopPicks";
@@ -95,22 +95,11 @@ const ColorPickerPopupContent = ({
       />
     </div>
   );
-  const popoverRef = useRef<HTMLDivElement>(null);
-
-  const focusPickerContent = () => {
-    popoverRef.current
-      ?.querySelector<HTMLDivElement>(".color-picker-content")
-      ?.focus();
-  };
 
   return (
     <PropertiesPopover
       container={container}
       style={{ maxWidth: "208px" }}
-      onFocusOutside={(event) => {
-        focusPickerContent();
-        event.preventDefault();
-      }}
       onPointerDownOutside={(event) => {
         if (eyeDropperState) {
           // prevent from closing if we click outside the popover
@@ -119,18 +108,7 @@ const ColorPickerPopupContent = ({
           event.preventDefault();
         }
       }}
-      onCloseAutoFocus={(e) => {
-        e.stopPropagation();
-        // prevents focusing the trigger
-        e.preventDefault();
-
-        // return focus to excalidraw container unless
-        // user focuses an interactive element, such as a button, or
-        // enters the text editor by clicking on canvas with the text tool
-        if (container && !isInteractive(document.activeElement)) {
-          container.focus();
-        }
-
+      onClose={() => {
         updateData({ openPopup: null });
         setActiveColorPickerSection(null);
       }}
@@ -166,8 +144,6 @@ const ColorPickerPopupContent = ({
           onEscape={(event) => {
             if (eyeDropperState) {
               setEyeDropperState(null);
-            } else if (isWritableElement(event.target)) {
-              focusPickerContent();
             } else {
               updateData({ openPopup: null });
             }
@@ -198,7 +174,7 @@ const ColorPickerTrigger = ({
   return (
     <Popover.Trigger
       type="button"
-      className={clsx("color-picker__button active-color", {
+      className={clsx("color-picker__button active-color properties-trigger", {
         "is-transparent": color === "transparent" || !color,
       })}
       aria-label={label}

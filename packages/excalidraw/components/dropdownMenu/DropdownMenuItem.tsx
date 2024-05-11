@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   getDropdownMenuItemClassName,
   useHandleDropdownMenuItemClick,
@@ -14,6 +14,7 @@ const DropdownMenuItem = ({
   shortcut,
   className,
   selected,
+  focus,
   onSelect,
   onClick,
   ...rest
@@ -24,16 +25,24 @@ const DropdownMenuItem = ({
   children: React.ReactNode;
   shortcut?: string;
   selected?: boolean;
+  focus?: boolean;
   className?: string;
 } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onSelect">) => {
   const handleClick = useHandleDropdownMenuItemClick(onClick, onSelect);
+  const ref = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (focus) {
+      ref.current?.focus();
+    }
+  }, [focus]);
 
   return (
     <button
       {...rest}
+      ref={ref}
       value={value}
       onClick={handleClick}
-      type="button"
       className={getDropdownMenuItemClassName(className, selected)}
       title={rest.title ?? rest["aria-label"]}
     >
