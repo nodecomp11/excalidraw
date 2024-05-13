@@ -263,6 +263,7 @@ const LayerUI = ({
                       })}
                     >
                       <Island
+                        draggable
                         padding={1}
                         className={clsx("App-toolbar", {
                           "zen-mode": appState.zenModeEnabled,
