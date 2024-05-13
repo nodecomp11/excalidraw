@@ -1,3 +1,5 @@
+import type { SubtypeMethods } from "./subtypes";
+import { getSubtypeMethods } from "./subtypes";
 import { getFontString, arrayToMap, isTestEnv, normalizeEOL } from "../utils";
 import type {
   ElementsMap,
@@ -32,6 +34,30 @@ import {
 } from "./containerCache";
 import type { ExtractSetType, MakeBrand } from "../utility-types";
 
+export const measureTextElement = function (element, next) {
+  const map = getSubtypeMethods(element.subtype);
+  if (map?.measureText) {
+    return map.measureText(element, next);
+  }
+
+  const fontSize = next?.fontSize ?? element.fontSize;
+  const font = getFontString({ fontSize, fontFamily: element.fontFamily });
+  const text = next?.text ?? element.text;
+  return measureText(text, font, element.lineHeight);
+} as SubtypeMethods["measureText"];
+
+export const wrapTextElement = function (element, containerWidth, next) {
+  const map = getSubtypeMethods(element.subtype);
+  if (map?.wrapText) {
+    return map.wrapText(element, containerWidth, next);
+  }
+
+  const fontSize = next?.fontSize ?? element.fontSize;
+  const font = getFontString({ fontSize, fontFamily: element.fontFamily });
+  const text = next?.text ?? element.originalText;
+  return wrapText(text, font, containerWidth);
+} as SubtypeMethods["wrapText"];
+
 export const normalizeText = (text: string) => {
   return (
     normalizeEOL(text)
@@ -64,21 +90,23 @@ export const redrawTextBoundingBox = (
 
   if (container) {
     maxWidth = getBoundTextMaxWidth(container, textElement);
-    boundTextUpdates.text = wrapText(
-      textElement.originalText,
-      getFontString(textElement),
-      maxWidth,
-    );
+    boundTextUpdates.text = wrapTextElement(textElement, maxWidth);
   }
-  const metrics = measureText(
-    boundTextUpdates.text,
-    getFontString(textElement),
-    textElement.lineHeight,
-  );
+  const metrics = measureTextElement(textElement, {
+    text: boundTextUpdates.text,
+  });
 
   boundTextUpdates.width = metrics.width;
   boundTextUpdates.height = metrics.height;
 
+  // Maintain coordX for non left-aligned text in case the width has changed
+  if (!container) {
+    if (textElement.textAlign === TEXT_ALIGN.RIGHT) {
+      boundTextUpdates.x += textElement.width - metrics.width;
+    } else if (textElement.textAlign === TEXT_ALIGN.CENTER) {
+      boundTextUpdates.x += textElement.width / 2 - metrics.width / 2;
+    }
+  }
   if (container) {
     const maxContainerHeight = getBoundTextMaxHeight(
       container,
@@ -187,17 +215,9 @@ export const handleBindTextResize = (
       (transformHandleType !== "n" && transformHandleType !== "s")
     ) {
       if (text) {
-        text = wrapText(
-          textElement.originalText,
-          getFontString(textElement),
-          maxWidth,
-        );
+        text = wrapTextElement(textElement, maxWidth);
       }
-      const metrics = measureText(
-        text,
-        getFontString(textElement),
-        textElement.lineHeight,
-      );
+      const metrics = measureTextElement(textElement, { text });
       nextHeight = metrics.height;
       nextWidth = metrics.width;
     }
