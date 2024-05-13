@@ -1777,12 +1777,26 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({ errorMessage: error.message });
       });
 
-    if (
-      this.state.exportEmbedScene &&
-      fileHandle &&
-      isImageFileHandle(fileHandle)
-    ) {
-      this.setState({ fileHandle });
+    if (fileHandle && isImageFileHandle(fileHandle)) {
+      this.setState({
+        fileHandle: this.state.exportEmbedScene ? fileHandle : null,
+        openDialog: null,
+        toast: {
+          message: fileHandle?.name
+            ? t("toast.fileSavedToFilename").replace(
+                "{filename}",
+                `"${fileHandle.name}"`,
+              )
+            : t("toast.fileSaved"),
+        },
+      });
+    } else if (type === "clipboard") {
+      this.setState({
+        openDialog: null,
+        toast: {
+          message: t("toast.copyToClipboard"),
+        },
+      });
     }
   };
 
