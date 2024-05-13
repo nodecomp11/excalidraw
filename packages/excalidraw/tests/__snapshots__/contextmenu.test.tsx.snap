@@ -13,6 +13,17 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "contextMenu": {
     "items": [
       {
+        "icon": null,
+        "label": "labels.autoTextSize",
+        "name": "autoTextSize",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
+      {
         "icon": <svg
           aria-hidden="true"
           className=""
@@ -4415,6 +4426,17 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "contextMenu": {
     "items": [
       {
+        "icon": null,
+        "label": "labels.autoTextSize",
+        "name": "autoTextSize",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
+      {
         "icon": <svg
           aria-hidden="true"
           className=""
@@ -5514,6 +5536,17 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "collaborators": Map {},
   "contextMenu": {
     "items": [
+      {
+        "icon": null,
+        "label": "labels.autoTextSize",
+        "name": "autoTextSize",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
       {
         "icon": <svg
           aria-hidden="true"
@@ -7322,6 +7355,17 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "contextMenu": {
     "items": [
       {
+        "icon": null,
+        "label": "labels.autoTextSize",
+        "name": "autoTextSize",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
+      {
         "icon": <svg
           aria-hidden="true"
           className=""
@@ -8188,6 +8232,17 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "collaborators": Map {},
   "contextMenu": {
     "items": [
+      {
+        "icon": null,
+        "label": "labels.autoTextSize",
+        "name": "autoTextSize",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
       {
         "icon": <svg
           aria-hidden="true"

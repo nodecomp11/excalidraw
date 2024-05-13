@@ -33,6 +33,7 @@ import {
   computeContainerDimensionForBoundText,
   computeBoundTextPosition,
   getBoundTextElement,
+  measureText,
 } from "./textElement";
 import {
   actionDecreaseFontSize,
@@ -111,6 +112,24 @@ export const textWysiwyg = ({
     return false;
   };
 
+  const getNormalizedEditableValue = () => {
+    const updatedTextElement =
+      Scene.getScene(element)?.getElement<ExcalidrawTextElement>(id);
+    const normalizedText = normalizeText(editable.value);
+
+    if (updatedTextElement) {
+      return wrapText(
+        normalizedText,
+        getFontString(element),
+        updatedTextElement.autoResize
+          ? Infinity
+          : Math.abs(updatedTextElement.width),
+      );
+    }
+
+    return normalizedText;
+  };
+
   const updateWysiwygStyle = () => {
     const appState = app.state;
     const updatedTextElement =
@@ -130,11 +149,11 @@ export const textWysiwyg = ({
       );
       let maxWidth = updatedTextElement.width;
 
+      let text = editable.value;
+
       let maxHeight = updatedTextElement.height;
       let textElementWidth = updatedTextElement.width;
-      // Set to element height by default since that's
-      // what is going to be used for unbounded text
-      const textElementHeight = updatedTextElement.height;
+      let textElementHeight = updatedTextElement.height;
 
       if (container && updatedTextElement.containerId) {
         if (isArrowElement(container)) {
@@ -224,6 +243,21 @@ export const textWysiwyg = ({
       }
 
       if (!container) {
+        text = wrapText(
+          text,
+          getFontString(element),
+          Math.abs(textElementWidth),
+        );
+
+        const metrics = measureText(
+          text,
+          getFontString(updatedTextElement),
+          updatedTextElement.lineHeight,
+        );
+
+        textElementHeight = metrics.height;
+
+        maxHeight = metrics.height;
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
         textElementWidth = Math.min(textElementWidth, maxWidth);
       } else {
@@ -262,7 +296,13 @@ export const textWysiwyg = ({
       if (isTestEnv()) {
         editable.style.fontFamily = getFontFamilyString(updatedTextElement);
       }
-      mutateElement(updatedTextElement, { x: coordX, y: coordY });
+
+      mutateElement(updatedTextElement, {
+        x: coordX,
+        y: coordY,
+        height: textElementHeight,
+        width: textElementWidth,
+      });
     }
   };
 
@@ -278,7 +318,7 @@ export const textWysiwyg = ({
   let whiteSpace = "pre";
   let wordBreak = "normal";
 
-  if (isBoundToContainer(element)) {
+  if (isBoundToContainer(element) || !element.autoResize) {
     whiteSpace = "pre-wrap";
     wordBreak = "break-word";
   }
@@ -340,7 +380,7 @@ export const textWysiwyg = ({
     };
 
     editable.oninput = () => {
-      onChange(normalizeText(editable.value));
+      onChange(getNormalizedEditableValue());
     };
   }
 
@@ -501,7 +541,7 @@ export const textWysiwyg = ({
     if (!updateElement) {
       return;
     }
-    let text = editable.value;
+    let text = getNormalizedEditableValue();
     const container = getContainerElement(
       updateElement,
       app.scene.getNonDeletedElementsMap(),

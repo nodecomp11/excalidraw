@@ -852,6 +852,9 @@ export const actionChangeTextAlign = register({
               newElement,
               app.scene.getContainerElement(oldElement),
               app.scene.getNonDeletedElementsMap(),
+              {
+                keepPreviousSize: true,
+              },
             );
             return newElement;
           }

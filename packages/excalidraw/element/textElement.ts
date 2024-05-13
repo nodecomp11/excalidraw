@@ -48,7 +48,10 @@ export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
   elementsMap: ElementsMap,
-  informMutation: boolean = true,
+  {
+    informMutation = true,
+    keepPreviousSize = false,
+  }: { informMutation?: boolean; keepPreviousSize?: boolean } = {},
 ) => {
   let maxWidth = undefined;
   const boundTextUpdates = {
@@ -70,14 +73,17 @@ export const redrawTextBoundingBox = (
       maxWidth,
     );
   }
+
   const metrics = measureText(
     boundTextUpdates.text,
     getFontString(textElement),
     textElement.lineHeight,
   );
 
-  boundTextUpdates.width = metrics.width;
-  boundTextUpdates.height = metrics.height;
+  if (!keepPreviousSize) {
+    boundTextUpdates.width = metrics.width;
+    boundTextUpdates.height = metrics.height;
+  }
 
   if (container) {
     const maxContainerHeight = getBoundTextMaxHeight(

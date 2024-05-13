@@ -240,24 +240,28 @@ export const newTextElement = (
     metrics,
   );
 
-  const textElement = newElementWith(
-    {
-      ..._newElementBase<ExcalidrawTextElement>("text", opts),
-      text,
-      fontSize,
-      fontFamily,
-      textAlign,
-      verticalAlign,
-      x: opts.x - offsets.x,
-      y: opts.y - offsets.y,
-      width: metrics.width,
-      height: metrics.height,
-      containerId: opts.containerId || null,
-      originalText: text,
-      lineHeight,
-    },
+  const textElementProps: ExcalidrawTextElement = {
+    ..._newElementBase<ExcalidrawTextElement>("text", opts),
+    text,
+    fontSize,
+    fontFamily,
+    textAlign,
+    verticalAlign,
+    x: opts.x - offsets.x,
+    y: opts.y - offsets.y,
+    width: metrics.width,
+    height: metrics.height,
+    containerId: opts.containerId || null,
+    originalText: text,
+    autoResize: true,
+    lineHeight,
+  };
+
+  const textElement: ExcalidrawTextElement = newElementWith(
+    textElementProps,
     {},
   );
+
   return textElement;
 };
 
@@ -271,11 +275,20 @@ const getAdjustedDimensions = (
   width: number;
   height: number;
 } => {
-  const { width: nextWidth, height: nextHeight } = measureText(
+  let { width: nextWidth, height: nextHeight } = measureText(
     nextText,
     getFontString(element),
     element.lineHeight,
   );
+
+  // wrapped text
+  if (!element.autoResize && !element.containerId) {
+    const prevWidth = element.width;
+    if (nextWidth < prevWidth) {
+      nextWidth = prevWidth;
+    }
+  }
+
   const { textAlign, verticalAlign } = element;
   let x: number;
   let y: number;
@@ -371,7 +384,7 @@ export const updateTextElement = (
   return newElementWith(textElement, {
     originalText,
     isDeleted: isDeleted ?? textElement.isDeleted,
-    ...refreshTextDimensions(textElement, container, elementsMap, originalText),
+    ...refreshTextDimensions(textElement, container, elementsMap, text),
   });
 };
 
